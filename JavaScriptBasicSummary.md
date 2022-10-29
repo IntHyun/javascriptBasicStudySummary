@@ -1,6 +1,6 @@
 # 자바스크립트
 
--   HTML은 콘텐츠와 골격, CSS는 웹페이지의 레이아웃, JavaScript는 웹페이지의 동작
+-   HTML은 콘텐츠와 골격, CSS는 웹페이지의 레이아웃, JavaScript(Brendan Eich, 브레덴 아이크, Netscape에 있었을 당시 개발)는 웹페이지의 동작
     -   ES1 (초판, 1997)
     -   ES2 (1998)
     -   ES3 (1999)
@@ -9,6 +9,7 @@
     -   ES7 (2016, ECMAScript 2016, 이하 생략)
     -   ES6 부터 `const`, `let`, `Promise`, `Arrow function`, `class` 등의 문법들이 대거 추가
     -   ECMA-인터내셔널 공식 사이트 : https://www.ecma-international.org/
+    -   wiki : https://en.wikipedia.org/wiki/ECMAScript
 
 ## 수업 환경 설정
 
@@ -47,7 +48,7 @@
 ```
 
 ```js
-<script src="test.js"></script>
+<script src='test.js'></script>
 ```
 
 ## JavaScript를 출력하는 4가지 방법
@@ -61,16 +62,53 @@
 
 1. 문(statement)은 세미콜론으로 구분(세미콜론을 붙이지 않는 곳도 있습니다.)
 2. 문은 값, 연산자, 키워드, 명령어, 표현식(값으로 평가, 함수나 key, index를 통한 값의 호출도 표현식) 등으로 구성됩니다.
-3. 공백 병합
+3. 공백 병합 :
+    1. 함수나 메서드 내 공백 병합
+    2. object 형 자료형 내 공백 병합
+    3. 선언식에서의 공백 병합
+    4. 메서드 채이닝의 공백 병합
+    5. 주의 : ''작은 따옴표, ""큰 따옴표는 개행 공백을 인식하지 못함 -> ``백틱, 템플릿 리터럴은 개행 공백을 인식함
 
 ```js
+// 1번
+console.log(1 +
+           2 +
+           3)
+console.log(1,
+           2,
+           3)
+
+// 2번
+[10,
+ 20,
+ 30]
+{
+    'one'  :1,
+    'two'  :2,
+    'three':3
+}
+
+// 3번
 let x = 10,
     y = 20,
     z = 30;
 console.log(x, y, z);
-// .a()
-// .b()
-// .c()
+
+// 4번
+[1, 2, 3]
+    .map(x=>x*2)
+    .map(x=>x*2)
+    .map(x=>x*2)
+    .map(x=>x*2)
+
+// 5번
+// error
+// console.log('abc
+//             abc
+//             ')
+console.log(`abc
+            abc
+            `)
 ```
 
 4. 주석
@@ -80,6 +118,18 @@ console.log(x, y, z);
 /*
 여러줄 주석입니다.
 */
+
+/**
+ * a와 b를 더함
+ *
+ * @author: jun
+ * @param {number} a 더할 숫자
+ * @param {number} b 더할 숫자
+ * @return {number} a + b를 반환함
+ */
+function add(a, b) {
+    return a + b;
+}
 ```
 
 5. 엄격모드
@@ -88,10 +138,26 @@ console.log(x, y, z);
 -   이러한 문법들은 기존 코드의 문제를 불러일으킬 수 있기 때문에 use strict라는 지시자를 통해 엄격모드를 활성화 했을 때에만 반영
 -   class 문법의 경우 엄격 모드가 기본
 -   함수별로 엄격모드를 다르게 적용할 수 있으나 혼란을 야기할 수 있습니다.
+-   변수 선언 키워드를 반드시 사용, delete 키워드 사용 불가
 
 ```js
-"use strict";
+'use strict';
 // 코드
+```
+
+```html
+<script>
+    'use strict';
+    a = 10; // error
+    console.log(age);
+</script>
+```
+
+```html
+<script>
+    a = 10; // error 아님!
+    console.log(age);
+</script>
 ```
 
 # 변수
@@ -106,30 +172,48 @@ console.log(x, y, z);
 -   var, let, const
     ```js
     if (true) {
-        const testName = "hojun";
+        const testName = 'hojun';
         let testAge = 10;
     }
     if (true) {
-        var testName2 = "hojun";
+        var testName2 = 'hojun';
         var testAge2 = 10;
     }
     ```
     -   var(ES5 이전, 지금 사용 권장 X) : 함수 레벨 스코프, 재선언시 애러 X
     -   let(ES5) : 블록 레벨 스코프, 재선언시 애러 O, 콘솔에서는 애러 X, 변경가능한 자료형
     -   const(ES5) : 블록 레벨 스코프, 재선언시 애러 O, 콘솔에서는 애러 X, 변경이 불가능한 자료형(상수)
+        -   모든 변수는 const를 사용하고, let을 꼭 사용해야 하는 변수에서만 let을 사용하길 권고합니다.
+        ```js
+        function hello() {
+            const x = 10;
+            // 1000줄의 코드
+            return x * 1000;
+        }
+        ```
+        -   DOM을 탐색해야 하는 경우 const를 사용하고, (간혹) $를 하는 경우도 있습니다. 반복문이나 함수 밖에서 주로 사용합니다.
+        ```js
+        const $helloElement = document.getElementById('hello');
+        ```
 
 # 연산
 
 -   산술 연산자(+, -, /, \*, \*\*, %)
--   할당 연산자(=, +=, -=, /=, \*=, \*\*=, %=)
--   논리 연산자(&&, ||, !, !!, &, |)
+-   (복합) 할당 연산자(=, +=, -=, /=, \*=, \*\*=, %=)
+-   논리 연산자(&&, ||, !, !!, &, |, ~)
 
     -   참 -> true -> 1
     -   거짓 -> false -> 0
     -   &&는 곱
     -   ||는 합
     -   !는 부정
+    -   !!는 true와 false를 반환하게 해주는 코드
     -   암기코드
+
+    ```js
+    // 할당연산자 체이닝(권하지 않습니다.)
+    a = b = c = 2 + 2;
+    ```
 
     ```js
     for (let x = 0; x < 100; x++) {
@@ -146,16 +230,49 @@ console.log(x, y, z);
     result3 = null || 100;
     result4 = null && 100;
 
-    username = "hojun";
-    result5 = username || "유저 이름이 없습니다";
+    username = 'hojun';
+    result5 = username || '유저 이름이 없습니다';
 
     username = undefined;
-    result5 = username || "유저 이름이 없습니다";
+    result5 = username || '유저 이름이 없습니다';
     ```
 
 -   비교 연산자(>, >=, <, <=, ==, !=, ===, !==)
+
+    -   문자열 비교 : 유니코드 순
+        -   문자열 순서대로 하나씩 비교하고, 문자가 모두 같은데 길이가 다른 경우 길이가 더 긴 것이 크다
+        ```js
+        leehojun > leehojung; // false
+        ```
+    -   다른 형을 가진 값 간의 비교 : 비교하려는 값의 자료형이 다르면 값들을 모두 숫자형으로 변환
+        ```js
+        console.log('2' > 1); // true
+        console.log('01' == 1); // true
+        ```
+    -   null과 undefined 비교하기
+        -   산술 연산자나 기타 비교 연산자를 사용하면(==, === 제외) null과 undefined는 숫자형으로 변환
+        -   null은 0
+        -   undefined는 NaN
+        ```js
+        console.log(null == undefined); // true
+        console.log(null === undefined); // false
+        ```
+    -   에지 케이스(edge case)
+
+        ```js
+        console.log(null > 0); // f(null이 0으로 변환)
+        console.log(null == 0); // f(null이 0으로 변환되지 않음)
+        console.log(null >= 0); // t(null이 0으로 변환)
+        // >= 연산을 할 때에 null이 0으로 변환이 되어 위와 같은 일을 만듬
+
+        console.log(undefined > 0); // f (undefined가 NaN으로 변환, NaN은 뒤도 돌아보지 않고 비교를 하면 false)
+        console.log(undefined < 0); // f (undefined가 NaN으로 변환, NaN은 뒤도 돌아보지 않고 비교를 하면 false)
+        console.log(undefined == 0); // f(undefined와 null이 같고, 그 외에 값은 false)
+        ```
+
 -   단항 산술 연산자(++x, x++, --x, x--)
 -   nullish 병합 연산자(??)
+-   비트 연산자(AND - &, OR - |, XOR - ^, NOT - ~, 왼쪽 시프트 - <<, 오른쪽 시프트 - >>, 부호 없는 오른쪽 시프트 - >>> )
 
     ```js
     let result1;
@@ -166,6 +283,17 @@ console.log(x, y, z);
 
     let result5 = null;
     let result6 = result5 ?? 100;
+
+    username = 'hojun';
+    result5 = username ?? '유저 이름이 없습니다';
+
+    username = undefined;
+    result5 = username ?? '유저 이름이 없습니다';
+
+    let x = 0;
+
+    console.log(x || 10); // 10 (x가 0이니 false로 판단)
+    console.log(x ?? 10); // 0 (x라는 값이 있다고 판단)
     ```
 
 -   typeof 연산자
@@ -177,9 +305,9 @@ console.log(x, y, z);
     ```js
     10 in [10, 20, 30]; // false
     1 in [10, 20, 30]; // true
-    1 in "hello"; // error
-    "name" in { name: "hojun", age: 10 }; //true
-    "length" in [10, 20, 30]; // true
+    1 in 'hello'; // error
+    'name' in { name: 'hojun', age: 10 }; //true
+    'length' in [10, 20, 30]; // true
     ```
 
 # 변수의 형
@@ -191,18 +319,26 @@ console.log(x, y, z);
 
 -   Number(숫자)
 
-    -   형태 : 10, 10.123, -10
+    -   형태 : 10, 10.123, -10, Infinity(1/0), -Infinity, NaN("hello"/2)
     -   호출 : 변수명
     -   메서드 :
         -   10.toString()는 안됩니다. 이유는 무엇일까요? 소수점 때문에 그렇습니다.(JavaScript의 parsing때문이고, 아는 분이 많지는 않습니다.)
         -   (10).toString()와 변수명.toString()은 가능합니다.
         -   num.toFixed()
+        ```js
+        num = 10.12345;
+        num.toFixed(3);
+        ('10.123');
+        ```
+        -   Number.MAX_SAFE_INTEGER : JavaScript에서 안전한 최대 정수값
+        -   Number.MIN_SAFE_INTEGER : JavaScript에서 안전한 최소 정수값
+        -   Number.MAX_VALUE : JavaScript가 표현할 수 있는 제일 큰 양의 숫자
     -   Number()
     -   parseInt() - 권고, parseFloat()
 
     ```js
-    parseInt("1hello world"); // 1
-    Number("1hello world"); // NaN
+    parseInt('1hello world'); // 1
+    Number('1hello world'); // NaN
     ```
 
     -   Math
@@ -218,6 +354,15 @@ console.log(x, y, z);
     -   NaN
     -   Infinity, -Infinity
 
+-   BigInt
+
+    -   (2\*\*53-1)(9007199254740991) 보다 큰 값을 Number로 나타낼 수 없으며, 나타내도 안전한 연산을 할 수 없습니다.
+
+    ```js
+    const big =
+        123123123123123123123123123123123123123123123123123123123123123123n;
+    ```
+
 -   String(문자열)
 
     -   형태 : 'abcde', "abcde", `abcde ${변수명}`
@@ -230,7 +375,7 @@ console.log(x, y, z);
         -   str.slice()
         -   str.split()
         -   str.substring()
-        -   str.substr()
+        -   str.substr() // 비권고 사항, MDN 문서 참고
         -   str.toLowerCase()
         -   str.toUpperCase()
         -   str.trim()
@@ -246,7 +391,7 @@ console.log(x, y, z);
         '5'.repeat(100).split('').map(e => parseInt(e))
         ```
 
--   Boolean(논리값)
+-   Boolean(논리값, 논리형, 분린형)
 
     -   형태 : true, false
     -   호출 : 변수명
@@ -299,6 +444,22 @@ console.log(x, y, z);
 
 -   Object(객체)
 
+    -   생성하는 방법
+
+    ```js
+    let data = new Object(); // '객체 생성자'
+    let data = {}; // '객체 리터럴'
+
+    let human = {
+        name: 'hojun',
+        age: 10,
+    };
+    human.name;
+    human['name'];
+    // delete human.age; // 권하지 않습니다.
+    // human.age = null // 권합니다.
+    ```
+
     -   형태 :
         ```js
         {
@@ -327,7 +488,7 @@ console.log(x, y, z);
         -   삭제 : delete value['hello']는 추천하지 않음(메모리 상에 'world'가 남아있음, value['hello'] = null을 권장)
     -   속성 :
         ```js
-        console.log(Object.getOwnPropertyDescriptor(person, "name"));
+        console.log(Object.getOwnPropertyDescriptor(person, 'name'));
         Object.getOwnPropertyDescriptors(person);
         // {10: {…}, name: {…}, age: {…}, height: {…}, weight: {…}, 이력: {…}}
         // value: '이호준',
@@ -348,10 +509,10 @@ console.log(x, y, z);
 
     ```js
     let map = new Map();
-    map.set("one", 100);
-    map.set("two", 200);
-    map.set("three", 300);
-    map.set("four", [10, 20]);
+    map.set('one', 100);
+    map.set('two', 200);
+    map.set('three', 300);
+    map.set('four', [10, 20]);
     map.set(5, [100, 200]);
     map.set([1, 2], [100, 200]);
     map.get(5);
@@ -364,9 +525,9 @@ console.log(x, y, z);
     // test[1] // 됩니다.
 
     let human = {
-        name: "hojun3",
+        name: 'hojun3',
         age: 30,
-        local: "jeju",
+        local: 'jeju',
     };
     let hojun = new Map(Object.entries(human));
     ```
@@ -398,6 +559,39 @@ console.log(x, y, z);
     const 차집합2 = [...b].filter((x) => !a.has(x));
     ```
 
+# 형변환
+
+-   String 보다는 toString(명시적)
+-   Number 보다는 parseInt(명시적)
+-   명시적 형변환이 아니라 암시적(묵시적) 형변환
+    ```js
+    console.log('6' / '2');
+    console.log('6' * '2');
+    console.log(+'6');
+    console.log(-'6');
+    console.log(Number(undefined));
+    console.log(Number(null));
+    console.log(Number(true));
+    console.log(Number(false));
+    ```
+-   0, null, undefined, NaN, ""은 false이며 그 외의 값은 true입니다.
+-   +를 사용해서 2개 이상을 연산할 때에 하나가 문자열이면 나머지 하나도 문자열로 연산합니다.(뺄셈과 나눗셈, 곱셈의 방식은 다릅니다.)
+    ```js
+    '2' + 2;
+    // '22'
+    2 + '2';
+    // '22'
+    1 + 1 + 3 + '2' + '2';
+    // 522
+    // 덧셈이 아닌 경우에는 다른 결과가 나옵니다
+    2 * '2';
+    // 4
+    '2' * '2';
+    // 4
+    '2' * 2;
+    // 4
+    ```
+
 # 조건문과 반복문
 
 ## 조건문
@@ -406,35 +600,111 @@ console.log(x, y, z);
 -   else if
 -   else
 -   switch
+
+    ```js
+    // 한 줄로 사용하는 경우도 종종 있습니다.
+    if (true) console.log('hello world');
+    ```
+
+    ```js
+    // if문 안에서 선언된 변수(let, const)는 밖에서 읽을 수 없습니다.
+    if (true) {
+        let x = 10;
+        console.log(x);
+    }
+    console.log(x);
+    ```
+
+    ```js
+    if (1) console.log('1');
+    if ('') console.log('공백없음');
+    if (' ') console.log('공백');
+    if ('hello') console.log('hello');
+    if (NaN) console.log('NaN');
+    if (null) console.log('null');
+    if ([]) console.log('[]'); // 주의
+    if ({}) console.log('{}'); // 주의
+    ```
+
     ```js
     if (false) {
-        console.log("hello 1");
+        console.log('hello 1');
     }
     if (false) {
-        console.log("hello 2");
+        console.log('hello 2');
     }
     if (true) {
-        console.log("hello 3");
+        console.log('hello 3');
     }
     if (true) {
-        console.log("hello 4");
+        console.log('hello 4');
     }
     ```
+
     ```js
     if (false) {
-        console.log("hello 1");
+        console.log('hello 1');
     } else if (false) {
-        console.log("hello 2");
+        console.log('hello 2');
     } else if (true) {
-        console.log("hello 3");
+        console.log('hello 3');
     } else if (true) {
-        console.log("hello 4");
+        console.log('hello 4');
     } else {
-        console.log("!!");
+        console.log('!!');
     }
     ```
+
     ```js
+    // condition ? value1 : value2;
     let result = true ? 1 : 100;
+    ```
+
+    -   문제 : 다음 if문을 3항 연산자로 만들어보세요.
+
+    ```js
+    // 문제1
+    let money = 500;
+    if (money < 1300) {
+        console.log('버스를 탈 수 없습니다.');
+    } else {
+        console.log('버스를 탔습니다.');
+    }
+    // let money = 500
+    // money < 1300 ? console.log('버스를 탈 수 없습니다.') : console.log('버스를 탔습니다.')
+
+    // 문제2
+    let money = 500;
+    if (money < 1300) {
+        money += 1000;
+    } else if (money < 2000) {
+        money += 500;
+    } else {
+        money += 100;
+    }
+    //let money = 500
+    //money < 1300 ? money += 1000 : (money < 2000 ? money += 500 : money += 100)
+
+    //let money = 500
+    //money < 1300 ? money += 1000 : money < 2000 ? money += 500 : money += 100
+    ```
+
+    ```js
+    // switch 문을 사용하실 때에는 type확인을 하세요!
+    switch (2) {
+        case 1:
+            console.log(100);
+            break;
+        case 2:
+            console.log(200);
+            break;
+        case 3:
+            console.log(300);
+            break;
+        default:
+            console.log('값이 없음');
+            break;
+    }
     ```
 
 ## 반복문
@@ -482,6 +752,46 @@ while (x < 10) {
     console.log(x);
     x++;
 }
+
+let x = 0;
+while (x < 10) {
+    console.log(x);
+    x += 2;
+}
+
+let x = 0;
+while (true) {
+    console.log(x);
+    x += 2;
+    if (x >= 10) {
+        break;
+    }
+}
+
+while (true) {
+    value = prompt('명령을 입력하세요.');
+    console.log(value);
+    if (value === 'break') {
+        break;
+    }
+}
+
+let value = ~~(Math.random() * 100);
+console.log(value);
+while (true) {
+    input = prompt('명령을 입력하세요.');
+    console.log(input);
+    if (value === parseInt(input)) {
+        break;
+    } else if (value > parseInt(input)) {
+        console.log('UP!!');
+    } else if (value < parseInt(input)) {
+        console.log('DOWN!!');
+    }
+}
+
+let i = 10;
+while (i) console.log(i--);
 ```
 
 ```js
@@ -500,6 +810,11 @@ a.forEach((e) => console.log(e ** 2));
 ```
 
 ```js
+// 문법
+// for (초깃값; 조건; 증감식) {
+//   // 구문
+// }
+
 //예제
 for (let i = 0; i < 10; i++) {
     if (i == 5) {
@@ -507,30 +822,80 @@ for (let i = 0; i < 10; i++) {
     }
     console.log(i);
 }
-```
 
-```js
-//예제
 for (let i = 0; i < 10; i++) {
     if (i == 5) break;
     console.log(i);
 }
-```
 
-```js
-//예제
-for (let i = 0; i < 10; i++) {
-    if (i == 5) break;
-    console.log(i);
-}
-```
-
-```js
-//예제
 for (let i = 0; i < 10; i++) {
     if (i == 5) continue;
     console.log(i);
 }
+
+// 여러가지 테스트 문법
+for (let i = 10; i > 0; i--) {
+    console.log(i);
+}
+
+let k = 1;
+for (; k < 10; k++) {
+    console.log(k);
+}
+
+let k = 1;
+for (; k < 10; ) {
+    console.log(k);
+    k += 2;
+}
+
+for (;;) {
+    value = prompt('명령을 입력하세요.');
+    console.log(value);
+    if (value === 'break') {
+        break;
+    }
+}
+
+for (let test = ['a', 'b', 'c', 'd']; test.length >= 1; test.pop()) {
+    console.log(test);
+}
+
+for (let test = ['a', 'b', 'c', 'd']; test.length >= 0; test.pop()) {
+    console.log(test);
+}
+
+for (let i = 2; i < 10; i++) {
+    for (let j = 1; j < 10; j++) {
+        console.log(`${i} X ${j} = ${i * j}`);
+    }
+}
+console.log('end');
+
+for (let i = 2; i < 10; i++) {
+    for (let j = 1; j < 10; j++) {
+        if (i == 5) break;
+        console.log(`${i} X ${j} = ${i * j}`);
+    }
+}
+console.log('end');
+
+outer: for (let i = 2; i < 10; i++) {
+    for (let j = 1; j < 10; j++) {
+        console.log(`${i} X ${j} = ${i * j}`);
+        if (i == 5) break outer;
+    }
+}
+console.log('end');
+
+for (let i = 2; i < 10; i++) {
+    for (let j = 1; j < 10; j++) {
+        if (i == 5) break;
+        console.log(`${i} X ${j} = ${i * j}`);
+    }
+    if (i == 5) break;
+}
+console.log('end');
 ```
 
 # 함수와 클래스
@@ -538,10 +903,27 @@ for (let i = 0; i < 10; i++) {
 ## 함수
 
 -   함수 표현식과 함수 선언식
+
     ```js
     let 함수표현식 = function () {}; // 호이스팅 X
     function 함수선언식() {} // 호이스팅 O
+
+    sum(10, 20);
+    function sum(x, y) {
+        return x + y;
+    }
+
+    sum(10, 20);
+    let sum = function (x, y) {
+        return x + y;
+    };
+
+    sum(10, 20);
+    let sum = (x, y) => {
+        return x + y;
+    };
     ```
+
 -   함수(파선아실)
 
     -   여기서 x, y를 보통 한국에서는 인자
@@ -639,6 +1021,15 @@ for (let i = 0; i < 10; i++) {
     // 함수표현식, 호이스팅 X
     let 제곱 = (x) => x ** 2;
 
+    // 인자가 1개일 때에는 괄호 X
+    let 제곱 = (x) => x ** 2;
+
+    // 본문이 있는 경우 중괄호
+    let 제곱 = (x) => {
+        console.log(x);
+        return x ** 2;
+    };
+
     function f(a, b) {
         let z = 10;
         let result = z + a + b;
@@ -670,10 +1061,25 @@ for (let i = 0; i < 10; i++) {
     ```
 
 -   익명 함수
+
     ```js
     console.dir(function (x, y) {
         return x + y;
     });
+    ```
+
+-   return
+    ```js
+    function hello() {
+        console.log('hello');
+        console.log('hello');
+        console.log('hello');
+        return;
+        console.log('hello');
+        console.log('hello');
+        console.log('hello');
+    }
+    hello();
     ```
 
 ## 클래스
@@ -690,7 +1096,7 @@ class Human {
     static b() {}
 }
 
-hojun = new Human("호준");
+hojun = new Human('호준');
 
 typeof hojun; // object
 typeof Human; // function
@@ -699,7 +1105,7 @@ typeof Human; // function
 // setter - 설정
 // # = private 필드
 class Student {
-    subject = "javascript study";
+    subject = 'javascript study';
     #level;
     constructor(level, name, skill) {
         this.#level = level;
@@ -715,19 +1121,19 @@ class Student {
         this.#level = level;
     }
     attack() {
-        console.log("파이어볼!");
+        console.log('파이어볼!');
     }
 }
 
 class Mento extends Student {
     codeReview() {
-        console.log("코드리뷰를 진행합니다.");
+        console.log('코드리뷰를 진행합니다.');
     }
 }
 
-let hojun = new Student(999, "호준", ["python", "js", "...생략..."]);
+let hojun = new Student(999, '호준', ['python', 'js', '...생략...']);
 
-let hojun2 = new Mento(999, "호준", ["python", "js", "...생략..."]);
+let hojun2 = new Mento(999, '호준', ['python', 'js', '...생략...']);
 ```
 
 # 예외처리, 전개표현식, 정규표현식, 리터럴 등
@@ -776,19 +1182,19 @@ try {
 
 ```js
 // 0 문자 제거
-let s = "010100020201020304812123";
-s.replace(/[^1-9]/g, "");
-("11221234812123");
+let s = '010100020201020304812123';
+s.replace(/[^1-9]/g, '');
+('11221234812123');
 
 // 앞 뒤 공백 제거(캐릭터 클래스 `\s`사용)
-s = "   010100020201020304812123    ";
-s.replace(/^\s+|\s+$/g, "");
-("010100020201020304812123");
+s = '   010100020201020304812123    ';
+s.replace(/^\s+|\s+$/g, '');
+('010100020201020304812123');
 
 // 문자열 내 공백 제거
-s = "  01010002020   102030  4812123  ";
-s.replace(/\s/g, "");
-("010100020201020304812123");
+s = '  01010002020   102030  4812123  ';
+s.replace(/\s/g, '');
+('010100020201020304812123');
 
 // 개행 제거
 s = `
@@ -797,18 +1203,18 @@ b
 c
 d
 `;
-("\na\nb\nc\nd\n");
-s.replace(/\n/g, "");
-("abcd");
+('\na\nb\nc\nd\n');
+s.replace(/\n/g, '');
+('abcd');
 
-s = "hello world HELLO WORLD";
+s = 'hello world HELLO WORLD';
 s.match(/hello/gi);
 
-s1 = "010-5000-2000";
-s2 = "010 5000 2000";
-s3 = "010~5000!2000";
-s4 = "010!!5000!!2000";
-s5 = "01050002000";
+s1 = '010-5000-2000';
+s2 = '010 5000 2000';
+s3 = '010~5000!2000';
+s4 = '010!!5000!!2000';
+s5 = '01050002000';
 
 s1.split(/-/g);
 
@@ -899,7 +1305,7 @@ let c = 0x1001; // c == 4097
     let x = 10,
         y = ((20)[(x, y)] = [y, x]);
 
-    let { a, b } = { b: "hello", a: "world" };
+    let { a, b } = { b: 'hello', a: 'world' };
     ```
 
 -   다른 언어에서는 언패킹이라고 부르기도 합니다.
@@ -927,7 +1333,7 @@ function 곱셈(a, b, 콜백함수) {
 
 덧셈(20, 30);
 곱셈(2, 6);
-console.log("hello world");
+console.log('hello world');
 ```
 
 -   Promise
@@ -944,11 +1350,11 @@ new Promise((resolve, reject) => {
     .finally((result) => result);
 
 let p = new Promise(function (resolve, reject) {
-    resolve("hello world");
+    resolve('hello world');
 })
     .then((메시지) => {
         alert(메시지);
-        return 메시지.split(" ")[0];
+        return 메시지.split(' ')[0];
     })
     .then((메시지) => {
         alert(메시지);
@@ -963,11 +1369,11 @@ p;
 
 let p = new Promise(function (resolve, reject) {
     // resolve('hello world');
-    reject("hello world");
+    reject('hello world');
 })
     .then((메시지) => {
         alert(메시지);
-        return 메시지.split(" ")[0];
+        return 메시지.split(' ')[0];
     })
     .then((메시지) => {
         alert(메시지);
@@ -977,17 +1383,17 @@ let p = new Promise(function (resolve, reject) {
         alert(메시지);
     })
     .catch((메시지) => {
-        alert("catch 실행!! :" + 메시지);
+        alert('catch 실행!! :' + 메시지);
     });
 
 let p = new Promise(function (resolve, reject) {
     // resolve('hello world');
-    reject("hello world");
+    reject('hello world');
 })
     .then((메시지) => {
         alert(메시지);
-        throw Error("에러 발생!");
-        return 메시지.split(" ")[0];
+        throw Error('에러 발생!');
+        return 메시지.split(' ')[0];
     })
     .then((메시지) => {
         alert(메시지);
@@ -997,17 +1403,17 @@ let p = new Promise(function (resolve, reject) {
         alert(메시지);
     })
     .catch((메시지) => {
-        alert("catch 실행!! :" + 메시지);
+        alert('catch 실행!! :' + 메시지);
     });
 
 let p = new Promise(function (resolve, reject) {
-    resolve("hello world");
+    resolve('hello world');
     //reject('hello world');
 })
     .then((메시지) => {
         alert(메시지);
-        throw Error("에러 발생!");
-        return 메시지.split(" ")[0];
+        throw Error('에러 발생!');
+        return 메시지.split(' ')[0];
     })
     .then((메시지) => {
         alert(메시지);
@@ -1017,13 +1423,13 @@ let p = new Promise(function (resolve, reject) {
         alert(메시지);
     })
     .catch((메시지) => {
-        alert("catch 실행!! :" + 메시지);
+        alert('catch 실행!! :' + 메시지);
     });
 
 let p = new Promise(function (resolve, reject) {
-    setTimeout(() => resolve("끝남!"), 3000);
+    setTimeout(() => resolve('끝남!'), 3000);
 });
-console.log("hello world");
+console.log('hello world');
 console.log(p);
 //VM92:4 hello world
 //VM92:5 Promise {<pending>}
@@ -1033,9 +1439,9 @@ console.log(p);
 //</pending>/VM139:1 Promise {<fulfilled>: '끝남!'}
 
 let p = new Promise(function (resolve, reject) {
-    setTimeout(() => resolve("끝남!"), 10000);
+    setTimeout(() => resolve('끝남!'), 10000);
 });
-console.log("hello world");
+console.log('hello world');
 console.log(p);
 //VM180:1 Promise {<pending>}
 
@@ -1057,7 +1463,7 @@ console.log(p);
 //}).then(d => console.log(d)).catch(e => console.log(e));
 
 let snack = async function () {
-    return "cake!";
+    return 'cake!';
 };
 
 snack;
@@ -1068,12 +1474,12 @@ snack();
 //Promise {<fulfilled>: 'cake!'}
 
 const f = fetch(
-    "https://raw.githubusercontent.com/paullabkorea/coronaVaccinationStatus/main/data/data.json"
+    'https://raw.githubusercontent.com/paullabkorea/coronaVaccinationStatus/main/data/data.json'
 );
 f;
 //Promise {<fulfilled>: Response}
 const f = fetch(
-    "https://raw.githubusercontent.com/paullabkorea/coronaVaccinationStatus/main/data/data.json"
+    'https://raw.githubusercontent.com/paullabkorea/coronaVaccinationStatus/main/data/data.json'
 )
     .then(function (response) {
         return response.json();
@@ -1084,7 +1490,7 @@ const f = fetch(
     });
 
 const f = fetch(
-    "https://raw.githubusercontent.com/paullabkorea/coronaVaccinationStatus/main/data/data.json"
+    'https://raw.githubusercontent.com/paullabkorea/coronaVaccinationStatus/main/data/data.json'
 )
     .then((d) => d.json())
     .then((d) => console.log(d));
@@ -1095,11 +1501,11 @@ const f = fetch(
 // 동기처리 //
 
 setTimeout(() => {
-    console.log("5초 끝!");
+    console.log('5초 끝!');
 }, 5000);
 
 setTimeout(() => {
-    console.log("10초 끝!");
+    console.log('10초 끝!');
 }, 10000);
 
 function cook(ms) {
@@ -1108,16 +1514,16 @@ function cook(ms) {
 
 const myCake = async () => {
     await cook(3000);
-    return "케이크";
+    return '케이크';
 };
 
 const myCoffee = async () => {
     await cook(2000);
-    return "커피";
+    return '커피';
 };
 const myCookie = async () => {
     await cook(5000);
-    return "쿠키";
+    return '쿠키';
 };
 
 async function asyncProcess() {
@@ -1135,11 +1541,11 @@ asyncProcess();
 // 비동기처리 //
 
 setTimeout(() => {
-    console.log("5초 끝!");
+    console.log('5초 끝!');
 }, 5000);
 
 setTimeout(() => {
-    console.log("10초 끝!");
+    console.log('10초 끝!');
 }, 10000);
 
 function cook(ms) {
@@ -1148,16 +1554,16 @@ function cook(ms) {
 
 const myCake = async () => {
     await cook(3000);
-    return "케이크";
+    return '케이크';
 };
 
 const myCoffee = async () => {
     await cook(2000);
-    return "커피";
+    return '커피';
 };
 const myCookie = async () => {
     await cook(5000);
-    return "쿠키";
+    return '쿠키';
 };
 
 async function promiseProcess() {
@@ -1206,7 +1612,7 @@ a();
         -   response.arrayBuffer() – ArrayBuffer(바이너리 데이터를 로우 레벨 형식으로 표현한 것) 형태 반환
 
 ```js
-fetch("https://jsonplaceholder.typicode.com/users/3")
+fetch('https://jsonplaceholder.typicode.com/users/3')
     .then((response) => response.json())
     .then((json) => console.log(json));
 
@@ -1224,7 +1630,7 @@ async function printImg() {
     const blobImg = await response.blob();
 
     //blob을 담을 img 태그를 만든다.
-    const img = document.createElement("img");
+    const img = document.createElement('img');
     //html body에 위에서 만든 img 태그를 삽입한다.
     document.body.append(img);
     //img 태그의 주소를 설정한다.
@@ -1232,18 +1638,39 @@ async function printImg() {
 }
 printImg();
 
-fetch("http://35.76.53.28:8080/mall")
+fetch('http://test.api.weniv.co.kr/mall')
+    .then((data) => data.json())
+    .then((data) => console.log(data));
+
+fetch('http://test.api.weniv.co.kr/mall')
     .then(function (response) {
-        console.log(1);
         return response.json();
     })
     .then((json) => {
-        const imgURL = "http://35.76.53.28:8080/" + json[0]["thumbnailImg"];
+        const imgURL = 'http://test.api.weniv.co.kr/' + json[0]['thumbnailImg'];
         console.log(imgURL);
-        const img2 = document.createElement("img");
-        //html body에 위에서 만든 img 태그를 삽입한다.
+        const img2 = document.createElement('img');
         document.body.append(img2);
         img2.src = imgURL;
+    });
+
+fetch('http://test.api.weniv.co.kr/mall')
+    .then(function (response) {
+        return response.json();
+    })
+    .then((json) => {
+        json.forEach((item) => {
+            const imgElement = document.createElement('img');
+            const h1Element = document.createElement('h1');
+
+            const imgURL =
+                'http://test.api.weniv.co.kr/' + item['thumbnailImg'];
+            imgElement.src = imgURL;
+            h1Element.innerText = item['productName'];
+
+            document.body.append(h1Element);
+            document.body.append(imgElement);
+        });
     });
 
 /*
@@ -1273,7 +1700,7 @@ DOM을 탐색해봅시다.
 ```js
 // body>h1{hello world}+p{hello}+div>h1{hello world}+p{hello}
 document.body.childNodes;
-document.body.childNodes[1] = "hello hojun";
+document.body.childNodes[1] = 'hello hojun';
 document.body.childNodes[3].childNodes[1];
 ```
 
@@ -1288,10 +1715,10 @@ document.getElementsByTagName();
 document.getElementsByClassName();
 
 // css 선택자로 단일 요소에 접근하기
-document.querySelector("selector");
+document.querySelector('selector');
 
 // css 선택자로 여러 요소에 접근하기
-document.querySelectorAll("selector");
+document.querySelectorAll('selector');
 
 // target 요소를 생성합니다.
 document.createElement(target);
@@ -1309,17 +1736,17 @@ element.removeChild(target);
 ```js
 // parentElement.insertBefore(target, location); target요소를 parentElement의 자식인 location 위치 앞으로 이동합니다.
 
-var span = document.createElement("span");
-var sibling = document.getElementById("childElement");
-var parentDiv = document.getElementById("parentElement");
+var span = document.createElement('span');
+var sibling = document.getElementById('childElement');
+var parentDiv = document.getElementById('parentElement');
 parentDiv.insertBefore(span, sibling);
 
-const myP = document.querySelector("p");
+const myP = document.querySelector('p');
 myP.innerHTML = "<strong>I'm Strong!!</strong>";
 
 ///////////////
 
-const cont = document.querySelector(".cont");
+const cont = document.querySelector('.cont');
 console.log(cont.firstElementChild); // 첫번째 자식을 찾습니다.
 console.log(cont.lastElementChild); // 마지막 자식을 찾습니다.
 console.log(cont.nextElementSibling); // 다음 형제요소를 찾습니다.
