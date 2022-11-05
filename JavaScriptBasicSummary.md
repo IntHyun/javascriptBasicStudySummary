@@ -1756,4 +1756,48 @@ console.log(cont.parentElement); // 부모 요소를 찾습니다.
 
 // 브라우저의 기본 이벤트 동작을 취소
 event.preventDefault();
+
+// 1
+제목 = document.createElement('h1');
+제목.innerText = 'hello world';
+document.body.append(제목);
+
+// 2
+for (let i = 0; i < 10; i++) {
+    내용 = document.createElement('p');
+    내용.innerText = 'hello world';
+    document.body.append(내용);
+}
+
+// 3
+컨테이너 = document.createElement('div');
+컨테이너.classList.add('one');
+컨테이너.classList.add('two');
+// 컨테이너.classList.add('three four')
+컨테이너.classList.remove('one');
+for (let i = 0; i < 10; i++) {
+    내용 = document.createElement('p');
+    내용.innerText = 'hello world';
+    컨테이너.append(내용);
+}
+document.body.append(컨테이너);
+
+// 콘솔창에서 실행
+컨테이너.classList;
+// DOMTokenList(2) ['one', 'two', value: 'one two']
+컨테이너.classList.remove('two');
+
+컨테이너.classList.toggle('four');
+// true
+컨테이너.classList.toggle('four');
+// false
+
+// 직접 attribute를 컨트롤
+컨테이너.getAttribute('class');
+// 'one four'
+컨테이너.hasAttribute('class');
+// true
+
+// 기존에 있었던 class는 날아갑니다.
+컨테이너.setAttribute('class', 'five six');
 ```
